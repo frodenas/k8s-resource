@@ -1,15 +1,16 @@
 # Kubernetes Resource
 
-A [Concourse](http://concourse.ci/) resource to interact with [Kubernetes](http://kubernetes.io/) (k8s) resources.
+A [Concourse](http://concourse.ci/) resource to apply [Kubernetes](http://kubernetes.io/) (k8s) resources.
 
 ## Source Configuration
 
 | Field           | Required | Type    | Description
 |:----------------|:--------:|:-------:|:-----------
 | url             | Y        | String  | Kubernetes URL
-| username        | Y        | String  | Kubernetes Username
-| password        | Y        | String  | Kubernetes Password
 | namespace       | Y        | String  | Kubernetes Namespace
+| username        | N        | String  | Kubernetes Username
+| password        | N        | String  | Kubernetes Password
+| record          | N        | Boolean | Kubectl --record option (defaults to `false`)
 | skip_tls_verify | N        | Boolean | Skip TLS certificates verification (defaults to `false`)
 | cert_data       | N        | String  | TLS certificate PEM-encoded bytes
 | key_data        | N        | String  | TLS certificate key PEM-encoded bytes
@@ -21,7 +22,7 @@ A [Concourse](http://concourse.ci/) resource to interact with [Kubernetes](http:
 
 ### `in`: Does nothing.
 
-### `out`: Creates a kubernetes resource.
+### `out`: Applies a kubernetes resource.
 
 Given a kubernetes configuration file (both `json` and `yaml` formats are accepted), applies it to a kubernetes resource.
 
@@ -61,7 +62,7 @@ resources:
 ``` yaml
 - put: my-kubernetes
   params:
-    manifest_path: my-pod-spec.yml
+    spec_path: my-pod-spec.yml
 ```
 
 ## Copyright

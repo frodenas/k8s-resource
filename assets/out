@@ -21,23 +21,11 @@ payload=$(mktemp $TMPDIR/k8s-resource-request.XXXXXX)
 cat > $payload <&0
 
 url=$(jq -r '.source.url // ""' < $payload)
-username=$(jq -r '.source.username // ""' < $payload)
-password=$(jq -r '.source.password // ""' < $payload)
 namespace=$(jq -r '.source.namespace // ""' < $payload)
 spec_path=$(jq -r '.params.spec_path // ""' < $payload)
 
 if [ -z "$url" ]; then
   echo "must specify source url"
-  exit 1
-fi
-
-if [ -z "$username" ]; then
-  echo "must specify source username"
-  exit 1
-fi
-
-if [ -z "$password" ]; then
-  echo "must specify source password"
   exit 1
 fi
 
@@ -49,6 +37,16 @@ fi
 if [ -z "$spec_path" ]; then
   echo "must specify param spec_path"
   exit 1
+fi
+
+username=$(jq -r '.source.username // ""' < $payload)
+if ! [ -z "$username" ]; then
+  username="--username $username"
+fi
+
+password=$(jq -r '.source.password // ""' < $payload)
+if ! [ -z "$password" ]; then
+  password="--password $password"
 fi
 
 skip_tls_verify=$(jq -r '.source.skip_tls_verify // ""' < $payload)
@@ -79,8 +77,8 @@ fi
 
 kubectl apply \
   --server "$url" \
-  --username "$username" \
-  --password "$password" \
+  "$username" \
+  "$password" \
   --namespace "$namespace" \
   $insecure_skip_tls_verify \
   $client_certificate \
