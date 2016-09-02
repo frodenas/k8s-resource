@@ -74,7 +74,7 @@ ca_data=$(jq -r '.source.ca_data // ""' < $payload)
 if [ -n "$ca_data" ]; then
   ca_file=$(mktemp $TMPDIR/k8s-resource-cafile.XXXXXX)
   echo $ca_data > $ca_file
-  certificate_authority="--certificate-authority ca_file"
+  certificate_authority="--certificate-authority $ca_file"
 fi
 
 kubectl apply \
