@@ -21,23 +21,11 @@ payload=$(mktemp $TMPDIR/k8s-resource-request.XXXXXX)
 cat > $payload <&0
 
 url=$(jq -r '.source.url // ""' < $payload)
-username=$(jq -r '.source.username // ""' < $payload)
-password=$(jq -r '.source.password // ""' < $payload)
 namespace=$(jq -r '.source.namespace // ""' < $payload)
 spec_path=$(jq -r '.params.spec_path // ""' < $payload)
 
 if [ -z "$url" ]; then
   echo "must specify source url"
-  exit 1
-fi
-
-if [ -z "$username" ]; then
-  echo "must specify source username"
-  exit 1
-fi
-
-if [ -z "$password" ]; then
-  echo "must specify source password"
   exit 1
 fi
 
@@ -51,6 +39,16 @@ if [ -z "$spec_path" ]; then
   exit 1
 fi
 
+username=$(jq -r '.source.username // ""' < $payload)
+if ! [ -z "$username" ]; then
+  username="--username $username"
+fi
+
+password=$(jq -r '.source.password // ""' < $payload)
+if ! [ -z "$password" ]; then
+  password="--password $password"
+fi
+
 skip_tls_verify=$(jq -r '.source.skip_tls_verify // ""' < $payload)
 if [ "$skip_tls_verify" = "true" ]; then
   insecure_skip_tls_verify="--insecure-skip-tls-verify"
@@ -59,34 +57,42 @@ fi
 cert_data=$(jq -r '.source.cert_data // ""' < $payload)
 if [ -n "${cert_data}" ]; then
   cert_file=$(mktemp $TMPDIR/k8s-resource-certfile.XXXXXX)
-  echo $cert_data > $cert_file
+  echo -e "$cert_data" > $cert_file
   client_certificate="--client-certificate $cert_file"
 fi
 
 key_data=$(jq -r '.source.key_data // ""' < $payload)
 if [ -n "$key_data" ]; then
   key_file=$(mktemp $TMPDIR/k8s-resource-keyfile.XXXXXX)
-  echo $key_data > $key_file
+  echo -e "$key_data" > $key_file
   client_key="--client-key $key_file"
 fi
 
 ca_data=$(jq -r '.source.ca_data // ""' < $payload)
 if [ -n "$ca_data" ]; then
   ca_file=$(mktemp $TMPDIR/k8s-resource-cafile.XXXXXX)
-  echo $ca_data > $ca_file
-  certificate_authority="--certificate-authority ca_file"
+  echo -e "$ca_data" > $ca_file
+  certificate_authority="--certificate-authority $ca_file"
 fi
 
-kubectl apply \
-  --server "$url" \
-  --username "$username" \
-  --password "$password" \
-  --namespace "$namespace" \
+record=$(jq -r '.source.record // ""' < $payload)
+if [ "$record" = "true" ]; then
+  record="--record"
+fi
+
+cd $source_dir
+
+/bin/sh -c "kubectl apply \
+  --server $url \
+  $username \
+  $password \
+  --namespace $namespace \
   $insecure_skip_tls_verify \
   $client_certificate \
   $client_key \
   $certificate_authority \
-  --filename "$spec_path"
+  --filename $spec_path \
+  $record"
 
 timestamp=$(date)
 
