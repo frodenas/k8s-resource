@@ -49,6 +49,11 @@ if ! [ -z "$password" ]; then
   password="--password $password"
 fi
 
+token=$(jq -r '.source.token // ""' < $payload)
+if ! [ -z "$token" ]; then
+  token="--token $token"
+fi
+
 skip_tls_verify=$(jq -r '.source.skip_tls_verify // ""' < $payload)
 if [ "$skip_tls_verify" = "true" ]; then
   insecure_skip_tls_verify="--insecure-skip-tls-verify"
@@ -86,6 +91,7 @@ cd $source_dir
   --server $url \
   $username \
   $password \
+  $token \
   --namespace $namespace \
   $insecure_skip_tls_verify \
   $client_certificate \
