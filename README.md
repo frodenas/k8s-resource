@@ -11,6 +11,7 @@ A [Concourse](http://concourse.ci/) resource to apply [Kubernetes](http://kubern
 | username        | N        | String  | Kubernetes Username
 | password        | N        | String  | Kubernetes Password
 | token           | N        | String  | Kubernetes Token
+| debug           | N        | Boolean | Show detailed execution
 | record          | N        | Boolean | Kubectl --record option (defaults to `false`)
 | skip_tls_verify | N        | Boolean | Skip TLS certificates verification (defaults to `false`)
 | cert_data       | N        | String  | TLS certificate PEM-encoded bytes
