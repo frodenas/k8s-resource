@@ -20,6 +20,11 @@ payload=$(mktemp $TMPDIR/k8s-resource-request.XXXXXX)
 
 cat > $payload <&0
 
+debug=$(jq -r '.source.debug // false' < $payload)
+if [[ $debug == true ]]; then
+  set -x
+fi
+
 url=$(jq -r '.source.url // ""' < $payload)
 namespace=$(jq -r '.source.namespace // ""' < $payload)
 spec_path=$(jq -r '.params.spec_path // ""' < $payload)
@@ -47,6 +52,11 @@ fi
 password=$(jq -r '.source.password // ""' < $payload)
 if ! [ -z "$password" ]; then
   password="--password $password"
+fi
+
+token=$(jq -r '.source.token // ""' < $payload)
+if ! [ -z "$token" ]; then
+  token="--token $token"
 fi
 
 skip_tls_verify=$(jq -r '.source.skip_tls_verify // ""' < $payload)
@@ -86,6 +96,7 @@ cd $source_dir
   --server $url \
   $username \
   $password \
+  $token \
   --namespace $namespace \
   $insecure_skip_tls_verify \
   $client_certificate \
