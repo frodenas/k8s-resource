@@ -16,6 +16,6 @@ fi
 
 mkdir -p $destination_dir
 
-echo '{}' >&3
+echo '{"version": {}}' >&3
 
 exit 0
