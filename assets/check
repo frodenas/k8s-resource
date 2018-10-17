@@ -7,6 +7,6 @@ exec 1>&2 # redirect all output to stderr for logging
 
 PATH=/usr/local/bin:$PATH
 
-echo '{"version": {}}' >&3
+echo '[]' >&3
 
 exit 0
