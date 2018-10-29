@@ -7,7 +7,7 @@ A [Concourse](http://concourse.ci/) resource to apply [Kubernetes](http://kubern
 | Field           | Required | Type    | Description
 |:----------------|:--------:|:-------:|:-----------
 | url             | Y        | String  | Kubernetes URL
-| namespace       | Y        | String  | Kubernetes Namespace
+| namespace       | N        | String  | Kubernetes Namespace, required unless set in `params`
 | username        | N        | String  | Kubernetes Username
 | password        | N        | String  | Kubernetes Password
 | token           | N        | String  | Kubernetes Token
@@ -33,6 +33,7 @@ Given a kubernetes configuration file (both `json` and `yaml` formats are accept
 | Field     | Required | Type   | Description
 |:----------|:--------:|:------:|:-----------
 | spec_path | Y        | String | Path to the resource spec file to apply
+| namespace | N        | String | Kubernetes Namespace, overwrites `source` namespace
 
 ## Example Configuration
 

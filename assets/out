@@ -26,7 +26,13 @@ if [[ $debug == true ]]; then
 fi
 
 url=$(jq -r '.source.url // ""' < $payload)
-namespace=$(jq -r '.source.namespace // ""' < $payload)
+params_namespace=$(jq -r '.params.namespace // ""' < $payload)
+if [ -n "${params_namespace}" ]; then
+  namespace=$params_namespace
+else
+  namespace=$(jq -r '.source.namespace // ""' < $payload)
+fi
+
 spec_path=$(jq -r '.params.spec_path // ""' < $payload)
 
 if [ -z "$url" ]; then
@@ -35,7 +41,7 @@ if [ -z "$url" ]; then
 fi
 
 if [ -z "$namespace" ]; then
-  echo "must specify source namespace"
+  echo "must specify source or params namespace"
   exit 1
 fi
 
